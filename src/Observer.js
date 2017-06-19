@@ -20,10 +20,14 @@ export default class{
     onEvent(){
         this.Socket.onevent = (packet) => {
             Emitter.emit(packet.data[0], packet.data[1]);
-
             if(this.store) this.passToStore('SOCKET_'+packet.data[0],  [ ...packet.data.slice(1)])
         };
-
+        
+        this.Socket._onSCEvent = (event,data) => {
+            Emitter.emit(event, data);
+            if(this.store) this.passToStore('SOCKET_'+event, data)
+        };
+        
         let _this = this;
 
         ["connect", "error", "disconnect", "reconnect", "reconnect_attempt", "reconnecting", "reconnect_error", "reconnect_failed", "connect_error", "connect_timeout", "connecting", "ping", "pong"]
