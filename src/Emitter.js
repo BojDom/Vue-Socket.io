@@ -36,10 +36,8 @@ export default new class {
 
     emit(label, ...args) {
         let listeners = this.listeners.get(label);
-
         if (listeners && listeners.length) {
             listeners.forEach((listener) => {
-                console.log(    args)
                 listener.callback.call(listener.vm,...args)
             });
             return true;

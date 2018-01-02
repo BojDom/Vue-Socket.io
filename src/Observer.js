@@ -25,7 +25,7 @@ export default class{
             Emitter.emit(event, data);
             if(this.store) this.passToStore('SOCKET_'+event, data)
         };
-        
+
         let _this = this;
 
         ["connect", "error", "disconnect", "reconnect", "reconnect_attempt", "reconnecting", "reconnect_error", "reconnect_failed", "connect_error", "connect_timeout", "connecting", "ping", "pong"]
@@ -36,7 +36,6 @@ export default class{
                 })
             })
     }
-
 
     passToStore(event, payload){
         if(!event.startsWith('SOCKET_')) return
