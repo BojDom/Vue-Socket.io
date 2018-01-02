@@ -39,6 +39,7 @@ export default new class {
 
         if (listeners && listeners.length) {
             listeners.forEach((listener) => {
+                console.log(    args)
                 listener.callback.call(listener.vm,...args)
             });
             return true;

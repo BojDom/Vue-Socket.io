@@ -13,9 +13,10 @@ export default {
 
         Vue.mixin({
             created(){
-                let sockets = this.$options['sockets']
+                let sockets = this.$options['sockets'];
 
-                this.$options.sockets = new Proxy({}, {
+
+/*                this.$options.sockets = new Proxy({}, {
                     set: (target, key, value) => {
                         Emitter.addListener(key, value, this)
                         target[key] = value
@@ -26,11 +27,13 @@ export default {
                         delete target.key;
                         return true
                     }
-                })
+                })*/
 
                 if(sockets){
                     Object.keys(sockets).forEach((key) => {
-                        this.$options.sockets[key] = sockets[key];
+                        Emitter.addListener(key, sockets[key],  this)
+
+                        //this.$options.sockets[key] = sockets[key];
                     });
                 }
             },
