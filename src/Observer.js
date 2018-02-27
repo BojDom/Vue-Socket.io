@@ -8,34 +8,28 @@ export default class{
         this.Socket = connection
 
         if(store) this.store = store;
-        Emitter.newlistener.debounce(500).subscribe(()=>{
-            this.onEvent()
+
+
+        this.onEvent()
+
+        Emitter.newlistener.subscribe(l=>{
+            if (l.added)
+                this.Socket.on(l.label,(data)=>{
+                    Emitter.emit(l.label,data)
+                })
+            else this.Socket.off(l.label)
         })
 
     }
 
     onEvent(){
-
-        Emitter.listeners.forEach((l,k)=>{
-            this.Socket.on(k,(data)=>{
-              Emitter.emit(k,data)
-              if(this.store) this.passToStore('SOCKET_'+k, data)
-            })
-        })
-        // this.Socket._onSCEvent = (event,data) => {
-
-        //     Emitter.emit(event, data);
-        //     if(this.store) this.passToStore('SOCKET_'+event, data)
-        // };
-
-
-/*        ["connect", "error", "disconnect", "reconnect", "reconnect_attempt", "reconnecting", "reconnect_error", "reconnect_failed", "connect_error", "connect_timeout", "connecting", "ping", "pong"]
+        ["connect", "error", "disconnect", "reconnect", "reconnect_attempt", "reconnecting", "reconnect_error", "reconnect_failed", "connect_error", "connect_timeout", "connecting", "ping", "pong"]
             .forEach((value) => {
                 this.Socket.on(value, (data) => {
                     Emitter.emit(value, data);
                     if(this.store) this.passToStore('SOCKET_'+value, data)
                 })
-            })*/
+            })
     }
 
     passToStore(event, payload){
@@ -57,25 +51,5 @@ export default class{
 
             if(action === camelcased) this.store.dispatch(namespaced, payload)
         }
-    }
-
-    clone(obj) {
-      if (obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
-        return obj;
-
-      if (obj instanceof Date)
-        var temp = new obj.constructor(); //or new Date(obj);
-      else
-        var temp = obj.constructor();
-
-      for (var key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          obj['isActiveClone'] = null;
-          temp[key] = this.clone(obj[key]);
-          delete obj['isActiveClone'];
-        }
-      }
-
-      return temp;
     }
 }

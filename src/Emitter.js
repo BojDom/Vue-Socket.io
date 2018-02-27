@@ -10,7 +10,10 @@ export default new class {
         if(typeof callback == 'function'){
             this.listeners.has(label) || this.listeners.set(label, []);
             this.listeners.get(label).push({callback: callback, vm: vm});
-            this.newlistener.onNext()
+            this.newlistener.onNext({
+                added:true,
+                label:label
+            })
             return true
         }
 
@@ -33,6 +36,9 @@ export default new class {
                 this.listeners.set(label, listeners);
                 return true;
             }
+            this.newlistener.onNext({
+                label:label
+            })            
         }
         return false;
     }
