@@ -14,9 +14,9 @@ export default {
         Vue.mixin({
             created(){
                 let sockets = this.$options['sockets'];
-                this.$socket.on = (eventName,cb)=>{
+/*                this.$socket.on = (eventName,cb)=>{
                     Emitter.addListener(eventName, cb,  this)
-                }
+                }*/
 
                 if(sockets){
                     Object.keys(sockets).forEach((key) => {

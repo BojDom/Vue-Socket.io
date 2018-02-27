@@ -1,40 +1,41 @@
 import Emitter from './Emitter'
-import Socket from 'socket.io-client'
+
 
 export default class{
 
     constructor(connection, store) {
 
-        if(typeof connection == 'string'){
-            this.Socket = Socket(connection);
-        }else{
-            this.Socket = connection
-        }
+        this.Socket = connection
 
         if(store) this.store = store;
-
-        this.onEvent()
+        Emitter.newlistener.debounce(500).subscribe(()=>{
+            this.onEvent()
+        })
 
     }
 
     onEvent(){
-        var super_onevent = this.Socket._onSCEvent;
-        
-        this.Socket._onSCEvent = (event,data) => {
-            super_onevent.call(this.Socket, [event,data]);
-            Emitter.emit(event, data);
-            if(this.store) this.passToStore('SOCKET_'+event, data)
-        };
 
-        let _this = this;
-
-        ["connect", "error", "disconnect", "reconnect", "reconnect_attempt", "reconnecting", "reconnect_error", "reconnect_failed", "connect_error", "connect_timeout", "connecting", "ping", "pong"]
-            .forEach((value) => {
-                _this.Socket.on(value, (data) => {
-                    Emitter.emit(value, data);
-                    if(_this.store) _this.passToStore('SOCKET_'+value, data)
-                })
+        Emitter.listeners.forEach((l,k)=>{
+            this.Socket.on(k,(data)=>{
+              Emitter.emit(k,data)
+              if(this.store) this.passToStore('SOCKET_'+k, data)
             })
+        })
+        // this.Socket._onSCEvent = (event,data) => {
+
+        //     Emitter.emit(event, data);
+        //     if(this.store) this.passToStore('SOCKET_'+event, data)
+        // };
+
+
+/*        ["connect", "error", "disconnect", "reconnect", "reconnect_attempt", "reconnecting", "reconnect_error", "reconnect_failed", "connect_error", "connect_timeout", "connecting", "ping", "pong"]
+            .forEach((value) => {
+                this.Socket.on(value, (data) => {
+                    Emitter.emit(value, data);
+                    if(this.store) this.passToStore('SOCKET_'+value, data)
+                })
+            })*/
     }
 
     passToStore(event, payload){
@@ -56,5 +57,25 @@ export default class{
 
             if(action === camelcased) this.store.dispatch(namespaced, payload)
         }
+    }
+
+    clone(obj) {
+      if (obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
+        return obj;
+
+      if (obj instanceof Date)
+        var temp = new obj.constructor(); //or new Date(obj);
+      else
+        var temp = obj.constructor();
+
+      for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          obj['isActiveClone'] = null;
+          temp[key] = this.clone(obj[key]);
+          delete obj['isActiveClone'];
+        }
+      }
+
+      return temp;
     }
 }

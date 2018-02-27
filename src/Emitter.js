@@ -1,13 +1,16 @@
+import {Subject} from 'rx-lite'
+
 export default new class {
     constructor() {
         this.listeners = new Map();
+        this.newlistener = new Subject()
     }
 
     addListener(label, callback, vm) {
         if(typeof callback == 'function'){
             this.listeners.has(label) || this.listeners.set(label, []);
             this.listeners.get(label).push({callback: callback, vm: vm});
-
+            this.newlistener.onNext()
             return true
         }
 
