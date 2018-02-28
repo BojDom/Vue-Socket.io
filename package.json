@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/MetinSeylan/Vue-Socket.io#readme",
   "dependencies": {
+    "rx-lite": "^4.0.8",
     "socket.io-client": "^1.4.6"
   },
   "devDependencies": {
