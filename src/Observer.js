@@ -15,6 +15,7 @@ export default class{
         Emitter.newlistener.subscribe(l=>{
             if (l.added)
                 this.Socket.on(l.label,(data)=>{
+                    this.passToStore('SOCKET_'+l.label, data)
                     Emitter.emit(l.label,data)
                 })
             else this.Socket.off(l.label)
