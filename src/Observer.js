@@ -17,7 +17,8 @@ export default class {
 		})
 
 		if (store) {
-			setTimeout(() => {
+
+
 				Object.keys(store._mutations).map(k => {
 					if (k.startsWith('SOCKET_')) {
 						Emitter.newlistener.onNext({
@@ -26,7 +27,7 @@ export default class {
 						})
 					}
 				})
-			}, 2500)
+					
 			this.store = store;
 		}
 
@@ -38,7 +39,6 @@ export default class {
 		.forEach((value) => {
 			this.Socket.on(value, (data) => {
 				Emitter.emit(value, data);
-				if (this.store) this.passToStore('SOCKET_' + value, data)
 			})
 		})
 	}
