@@ -1,53 +1,28 @@
-import {Subject} from 'rx-lite'
-
-export default new class {
+import {remove} from 'lodash';
+import {observable} from 'mobx';
+export default new class  {
     constructor() {
-        this.listeners = new Map();
-        this.newlistener = new Subject()
+        this.listeners = observable.map(null,{deep:false,name:'listeners'});
+        this.channels = observable.map(null,{deep:false,name:'channels'})
     }
 
     addListener(label, callback, vm) {
-        if(typeof callback == 'function'){
-            this.listeners.has(label) || this.listeners.set(label, []);
-            this.listeners.get(label).push({callback: callback, vm: vm});
-            this.newlistener.onNext({
-                added:true,
-                label:label
-            })
-            return true
-        }
-
-        return false
+        this.listeners.has(label) || this.listeners.set(label,[])
+        this.listeners.get(label).push({callback, vm});
     }
 
-    removeListener(label, callback, vm) {
-        let listeners = this.listeners.get(label),
-            index;
-
-        if (listeners && listeners.length) {
-            index = listeners.reduce((i, listener, index) => {
-                return (typeof listener.callback == 'function' && listener.callback === callback && listener.vm == vm) ?
-                    i = index :
-                    i;
-            }, -1);
-
-            if (index > -1) {
-                listeners.splice(index, 1);
-                this.listeners.set(label, listeners);
-                return true;
-            }
-            this.newlistener.onNext({
-                label:label
-            })            
-        }
-        return false;
+    removeListeners(vm) {
+        this.listeners.toJS().forEach((ev,k)=>{
+            remove(ev,e=>e.vm._uid===vm._uid)
+            if (!ev.length) this.listeners.delete(k)
+        })
     }
 
-    emit(label, ...args) {
+    emit(label, data) {
         let listeners = this.listeners.get(label);
         if (listeners && listeners.length) {
             listeners.forEach((listener) => {
-                listener.callback.call(listener.vm,...args)
+                listener.callback.call(listener.vm,data)
             });
             return true;
         }
